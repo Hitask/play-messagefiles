@@ -1,10 +1,10 @@
 # Here you can create play commands that are specific to the module, and extend existing commands
 
-MODULE = 'play-filemessages'
+MODULE = 'messagefiles'
 
 # Commands that are specific to your module
 
-COMMANDS = ['play-filemessages:hello']
+COMMANDS = ['messagefiles:hello']
 
 def execute(**kargs):
     command = kargs.get("command")
@@ -12,7 +12,7 @@ def execute(**kargs):
     args = kargs.get("args")
     env = kargs.get("env")
 
-    if command == "play-filemessages:hello":
+    if command == "messagefiles:hello":
         print "~ Hello"
 
 
