@@ -1,4 +1,4 @@
-package messagefiles.plugins;
+package play.modules.messagefiles;
 
 import java.io.File;
 import java.io.FileInputStream;
