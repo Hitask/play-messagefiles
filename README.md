@@ -6,7 +6,7 @@ This module allows you to split localization `messages` files into separate mana
 You can organize files in folder-per-language structure, containing multiple files:
 ```
 \en
-   - phomepage.properties
+   - homepage.properties
    - products.properties
 \fr
    - homepage.properties
@@ -32,7 +32,7 @@ in page template reference this message as
 
 Add following line to `application.conf`:
 ```
-messagefiles.path=localization
+messagefiles.path=/localization
 ```
 
 Where localization is your chosen path to store the files.
