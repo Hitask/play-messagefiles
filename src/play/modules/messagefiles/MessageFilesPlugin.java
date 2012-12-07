@@ -15,11 +15,14 @@ import play.libs.IO;
 import play.vfs.VirtualFile;
 
 public class MessageFilesPlugin extends PlayPlugin {
+	private static final String PLUGIN_NAME = "MessageFiles Plugin";
 	private static final String CONF_LANGS_PATH_KEY = "messagefiles.path";
 	private static final String CONF_DEFAULT_LOCALE_KEY = "messagefiles.defaultLocale";
+	private static final String CONF_ENABLE_DIAGNOSTICS = "messagefiles.enableDiagnostics";
 	private static final String PROPERTIES_EXTENSION = ".properties";
 	private static long lastLoading = 0L;
 	private FilenameFilter propertiesFileFilter;
+	private boolean diagEnabled = false;
 	
 	public MessageFilesPlugin() {
 		propertiesFileFilter = new FilenameFilter() {
@@ -28,10 +31,13 @@ public class MessageFilesPlugin extends PlayPlugin {
 				return name.contains(PROPERTIES_EXTENSION);
 			}
 		};
+		
+		diagMessage("has been instantiated");
 	}
 	
 	@Override
 	public void onApplicationStart() {
+		diagEnabled = Boolean.parseBoolean(Play.configuration.getProperty(CONF_ENABLE_DIAGNOSTICS, "false"));
 		loadMessages();
 	}
 	
@@ -55,9 +61,12 @@ public class MessageFilesPlugin extends PlayPlugin {
 	}
 	
 	private void loadMessages() {
+		diagMessage("going to load messages");
+		
 		String langsPath = getLangsPath();
 		VirtualFile langsRoot = getLangsRoot();
 		String defaultLocale = Play.configuration.getProperty(CONF_DEFAULT_LOCALE_KEY);
+		int totalMessagesLoaded = 0;
 		
 		if (defaultLocale == null) {
 			Logger.warn("%s is not defined in application.conf", CONF_DEFAULT_LOCALE_KEY);
@@ -69,12 +78,18 @@ public class MessageFilesPlugin extends PlayPlugin {
 			Logger.error("%s is defined in application.conf but respective folder could not be found", CONF_LANGS_PATH_KEY);
 		} else {
 			for (String locale : Play.langs) {
+				diagMessage("found %s locale in Play locales", locale);
+				
 				VirtualFile localeRoot = langsRoot.child(locale);
 				if (localeRoot == null || !localeRoot.exists()) {
 					Logger.warn("Could not find %s locale in %s", locale, langsPath);
 				} else {
+					diagMessage("going to load %s messages from %s", locale, localeRoot.getRealFile().getAbsolutePath());
+					
 					for (File file : localeRoot.getRealFile().listFiles(propertiesFileFilter)) {
 						try {
+							diagMessage("going to load messages from %s", file.getAbsolutePath());
+							
 							String prefix = file.getName().replace(PROPERTIES_EXTENSION, "");
 							Properties props = readLocalizationFile(file);
 							Properties propsWithPrefix = new Properties();
@@ -86,6 +101,9 @@ public class MessageFilesPlugin extends PlayPlugin {
 							
 							Messages.locales.put(locale, propsWithPrefix);
 							
+							diagMessage("loaded %d messages", propsWithPrefix.size());
+							totalMessagesLoaded += propsWithPrefix.size();
+							
 							// Put messages from this locale in Play default messages 
 							// if this locale is defined as default in configuration.
 							if (defaultLocale != null && defaultLocale.equals(locale)) {
@@ -93,14 +111,21 @@ public class MessageFilesPlugin extends PlayPlugin {
 									Messages.defaults = new Properties();
 								}
 								Messages.defaults.putAll(propsWithPrefix);
+								
+								diagMessage("locale %s is default", locale);
 							}
 						} catch (FileNotFoundException e) {
 							Logger.warn(e, "Could not read %s", file.getAbsolutePath());
 						}
 					}
+					
+					diagMessage("done loading %s messages", locale);
 				}
 			}
 		}
+		
+		diagMessage("loaded %d messages total", totalMessagesLoaded);
+		diagMessage("done loading messages");
 	}
 	
 	private String getLangsPath() {
@@ -117,5 +142,11 @@ public class MessageFilesPlugin extends PlayPlugin {
 		}
 		
 		return null;
+	}
+	
+	private void diagMessage(String message, Object... args) {
+		if (diagEnabled) {
+			Logger.info(PLUGIN_NAME + ": " + message, args);
+		}
 	}
 }
