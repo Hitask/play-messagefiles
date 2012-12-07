@@ -96,10 +96,18 @@ public class MessageFilesPlugin extends PlayPlugin {
 							
 							// Prepend prefix.
 							for (Entry<Object, Object> prop : props.entrySet()) {
-								propsWithPrefix.put(prefix + "." + (String)prop.getKey(), prop.getValue());
+								propsWithPrefix.put(prefix + "." + ((String)prop.getKey()).trim(), prop.getValue());
 							}
 							
-							Messages.locales.put(locale, propsWithPrefix);
+							Properties alreadyLoaded = Messages.locales.get(locale);
+							
+							if (alreadyLoaded == null) {
+								alreadyLoaded = new Properties();
+							}
+							
+							// Append messages to already existing.
+							alreadyLoaded.putAll(propsWithPrefix);
+							Messages.locales.put(locale, alreadyLoaded);
 							
 							diagMessage("loaded %d messages", propsWithPrefix.size());
 							totalMessagesLoaded += propsWithPrefix.size();
