@@ -135,7 +135,6 @@ public class MessageFilesPlugin extends PlayPlugin {
 		}
 		
 		diagMessage("loaded %d messages total", totalMessagesLoaded);
-		diagMessage("done loading messages");
 	}
 	
 	private String getLangsPath() {
