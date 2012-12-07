@@ -7,6 +7,8 @@ import java.io.FilenameFilter;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
+
 import play.Logger;
 import play.Play;
 import play.PlayPlugin;
@@ -96,7 +98,7 @@ public class MessageFilesPlugin extends PlayPlugin {
 							
 							// Prepend prefix.
 							for (Entry<Object, Object> prop : props.entrySet()) {
-								propsWithPrefix.put(prefix + "." + ((String)prop.getKey()).trim(), prop.getValue());
+								propsWithPrefix.put(prefix + "." + ((String)prop.getKey()).trim(), trimPropertyValue((String)prop.getValue()));
 							}
 							
 							Properties alreadyLoaded = Messages.locales.get(locale);
@@ -156,5 +158,9 @@ public class MessageFilesPlugin extends PlayPlugin {
 		if (diagEnabled) {
 			Logger.info(PLUGIN_NAME + ": " + message, args);
 		}
+	}
+	
+	private String trimPropertyValue(String value) {
+		return StringUtils.stripStart(value.trim(), "=").trim();
 	}
 }
