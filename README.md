@@ -1,7 +1,9 @@
 ## Play message files
 
 
-This module allows you to split localization `messages` files into separate manageable files.
+This module allows you to split localization `messages` files into separate manageable files. Localized messages prefixed by file name. This allows for granular organization of localizations of large websites with lot of pages.
+
+The module is sucecssfully used at HiTask project management service http://hitask.com for website and web application localization.
 
 You can organize files in folder-per-language structure, containing multiple files:
 ```
