@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -21,10 +22,13 @@ public class MessageFilesPlugin extends PlayPlugin {
 	private static final String CONF_LANGS_PATH_KEY = "messagefiles.path";
 	private static final String CONF_DEFAULT_LOCALE_KEY = "messagefiles.defaultLocale";
 	private static final String CONF_ENABLE_DIAGNOSTICS = "messagefiles.enableDiagnostics";
+	private static final String CONF_FORCE_LOAD_ONCE = "messagefiles.forceLoadOnce";
 	private static final String PROPERTIES_EXTENSION = ".properties";
 	private static long lastLoading = 0L;
 	private FilenameFilter propertiesFileFilter;
 	private boolean diagEnabled = false;
+	private boolean forceLoadOnce = false;
+	private static final AtomicBoolean loaded = new AtomicBoolean(false);
 	
 	public MessageFilesPlugin() {
 		propertiesFileFilter = new FilenameFilter() {
@@ -40,6 +44,7 @@ public class MessageFilesPlugin extends PlayPlugin {
 	@Override
 	public void onApplicationStart() {
 		diagEnabled = Boolean.parseBoolean(Play.configuration.getProperty(CONF_ENABLE_DIAGNOSTICS, "false"));
+		forceLoadOnce = Boolean.parseBoolean(Play.configuration.getProperty(CONF_FORCE_LOAD_ONCE, "false"));
 		loadMessages();
 	}
 	
@@ -63,6 +68,10 @@ public class MessageFilesPlugin extends PlayPlugin {
 	}
 	
 	private void loadMessages() {
+		if (loaded.getAndSet(true) && forceLoadOnce) {
+			return;
+		}
+		
 		diagMessage("going to load messages");
 		
 		String langsPath = getLangsPath();
