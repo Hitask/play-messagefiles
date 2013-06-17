@@ -1,4 +1,4 @@
-self: play -> messagefiles 1.0
+self: play -> messagefiles 1.1
 
 require:
-    - play 1.*
+    - play 1.2.*
