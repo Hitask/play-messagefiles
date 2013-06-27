@@ -48,6 +48,7 @@ Where localization is your chosen path to store the files.
 * This directory must contain directories with message files. Name of each directory must be the name of specific locale.
 * Module uses `application.langs` parameter in order to load only required locales.
 * Each message file must have `.properties` extension.
+* In Dev mode Play forces to reload messages almost each request (sometimes it is an inappropriate). In order to load messages only once in Dev mode (exactly like it happens in Prod mode) you may consider using `messagefiles.forceLoadOnce` parameter. Set it to `true` and messages will be loaded only once like in Prod mode. In Prod mode this parameter does not affect module behaviour - messages will be loaded only once even if you set the parameter to `false`.
 
 
 ## Author
