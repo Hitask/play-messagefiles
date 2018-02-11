@@ -16,6 +16,14 @@ You can organize files in folder-per-language structure, containing multiple fil
 ```
 localization messages accessed by file. prefix.
 
+## Build
+
+```
+play build-module .
+```
+
+Resulting package will be in `dist/*.zip`
+
 ### Example:
 
 
